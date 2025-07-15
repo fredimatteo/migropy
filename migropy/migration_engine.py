@@ -260,7 +260,7 @@ class MigrationEngine:
         result = self.db.execute("SELECT COUNT(*) FROM migrations")
         return result.fetchone()[0] > 0
 
-    def __get_last_revision_executed_name(self) -> str:
+    def __get_last_revision_executed_name(self) -> str | None:
         """
         Retrieves the last executed revision from the migrations table.
 
@@ -270,4 +270,5 @@ class MigrationEngine:
         result = result.fetchone()
         if len(result) > 0:
             return result[0]
+
         return None
