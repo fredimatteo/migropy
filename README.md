@@ -1,6 +1,5 @@
 ![Python versions](https://img.shields.io/pypi/pyversions/migropy?style=flat-square&logo=python&logoColor=white&color)
 ![Test](https://img.shields.io/github/actions/workflow/status/fredimatteo/migratron/test.yml?style=flat-square&logo=github&logoColor=white&color&label=Test)
-![Pepy Total Downloads](https://img.shields.io/pepy/dt/migropy?style=flat-square&logo=pypi&logoColor=white&color)
 
 # 🛠️ Migropy
 
