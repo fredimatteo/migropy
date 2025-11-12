@@ -77,10 +77,12 @@ type = postgres # or mysql
 # path to migration scripts
 # use forward slashes (/) also on windows to provide an os agnostic path
 script_location = migropy
+# option available with postgres
+base_schema = public
 
 [logger]
 # available levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
-level = DEBUG
+level = INFO
 ```
 
 ### 3. Create a new migration

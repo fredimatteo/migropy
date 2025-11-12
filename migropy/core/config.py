@@ -14,6 +14,7 @@ class Config:
     db_type: str = ''
 
     script_location: str = 'migropy'
+    base_schema: str = 'public'
 
     logger_level: str = 'INFO'
 
