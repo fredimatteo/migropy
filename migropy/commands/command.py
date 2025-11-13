@@ -34,6 +34,10 @@ class Commands:
 
         match self.command:
             case CommandsEnum.INIT:
+                if "project_name" in kwargs:
+                    project_name = kwargs["project_name"]
+                    self.__init(project_name)
+                    return
                 self.__init()
             case CommandsEnum.GENERATE:
                 if "migration_name" not in kwargs:
@@ -69,12 +73,19 @@ class Commands:
             if not template_dir.exists():
                 raise FileNotFoundError(f"Template directory {template_dir} does not exist")
 
-            ini_files = list(template_dir.glob("*.ini"))
+            ini_files = list(template_dir.glob("migropy.ini"))
             if not ini_files:
                 raise FileNotFoundError("No .ini template file found in the templates directory")
 
             ini_content = ini_files[0].read_text(encoding="utf-8")
             Path("migropy.ini").write_text(ini_content, encoding="utf-8")
+
+            python_files = list(template_dir.glob("migropy_env.py"))
+            if not python_files:
+                raise FileNotFoundError("No .py template file found in the templates directory")
+
+            python_content = python_files[0].read_text(encoding="utf-8")
+            Path("migropy_env.py").write_text(python_content, encoding="utf-8")
 
             versions_path = Path(project_path) / "versions"
             versions_path.mkdir(parents=True, exist_ok=True)
@@ -88,7 +99,7 @@ class Commands:
     @staticmethod
     def __generate(migration_name: str):
         db = get_db_connector(load_config())
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
 
         migration_engine.init()
         migration_engine.generate_revision(migration_name)
@@ -97,14 +108,14 @@ class Commands:
     def __upgrade():
         db = get_db_connector(load_config())
 
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
         migration_engine.upgrade()
 
     @staticmethod
     def __downgrade():
         db = get_db_connector(load_config())
 
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
         migration_engine.downgrade()
 
     @staticmethod
@@ -117,5 +128,5 @@ class Commands:
     def __rollback(migrations_to_rollback: int):
         db = get_db_connector(load_config())
 
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
         migration_engine.rollback(migrations_to_rollback)
