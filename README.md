@@ -111,17 +111,17 @@ Migropy loads configuration in this order:
 
 #### ⚙️ Supported environment variables
 
-| Environment Variable      | Description                                |
-|---------------------------|--------------------------------------------|
-| `MIGROPY_DB_HOST`         | Database host                              |
-| `MIGROPY_DB_PORT`         | Database port                              |
-| `MIGROPY_DB_USER`         | Database user                              |
-| `MIGROPY_DB_PASSWORD`     | Database password                          |
-| `MIGROPY_DB_NAME`         | Database name                              |
-| `MIGROPY_DB_TYPE`         | Database type (e.g., postgres, mysql)      |
-| `MIGROPY_MIGRATIONS_PATH` | Path to migration scripts                  |
-| `MIGROPY_BASE_SCHEMA`     | Base schema (Postgres only)                |
-| `MIGROPY_LOG_LEVEL`       | Logging level (e.g., DEBUG, INFO, WARNING) |
+| Environment Variable    | Description                                |
+|-------------------------|--------------------------------------------|
+| `MIGRO_DB_HOST`         | Database host                              |
+| `MIGRO_DB_PORT`         | Database port                              |
+| `MIGRO_DB_USER`         | Database user                              |
+| `MIGRO_DB_PASSWORD`     | Database password                          |
+| `MIGRO_DB_NAME`         | Database name                              |
+| `MIGRO_DB_TYPE`         | Database type (e.g., postgres, mysql)      |
+| `MIGRO_MIGRATIONS_PATH` | Path to migration scripts                  |
+| `MIGRO_BASE_SCHEMA`     | Base schema (Postgres only)                |
+| `MIGRO_LOG_LEVEL`       | Logging level (e.g., DEBUG, INFO, WARNING) |
 
 ### 4. Create a new migration
 
