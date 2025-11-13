@@ -1,12 +1,15 @@
+import os
 import sys
 import types
 
 import pytest
+from dotenv import load_dotenv
 
 from migropy.commands.command import Commands, CommandsEnum
 from migropy.databases.commons import DbConfig
 from migropy.databases.postgres import Postgres
-from tests import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
+
+load_dotenv()
 
 
 @pytest.fixture
@@ -22,12 +25,12 @@ def mock_migropy_module(tmp_path, monkeypatch):
     (templates_dir / "migropy.ini").write_text(
         f"""
         [database]
-        host = {DB_HOST}
-        port = {DB_PORT}
-        user = {DB_USER}
-        password = {DB_PASSWORD}
-        dbname = {DB_NAME}
-        type = postgres
+        host = ""
+        port = ""
+        user = ""
+        password = ""
+        dbname = ""
+        type = ""
 
         [migrations]
         script_location = migropy
@@ -66,11 +69,11 @@ def initialized_project(tmp_path, mock_migropy_module, monkeypatch):
 def db_instance():
     db = Postgres(
         DbConfig(
-            host=DB_HOST,
-            port=DB_PORT,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME,
+            host=os.getenv('MIGRO_DB_HOST'),
+            port=int(os.getenv('MIGRO_DB_PORT', '5432')),
+            user=os.getenv('MIGRO_DB_USER'),
+            password=os.getenv('MIGRO_DB_PASSWORD'),
+            database=os.getenv('MIGRO_DB_NAME'),
         )
     )
     yield db
