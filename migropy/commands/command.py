@@ -120,7 +120,7 @@ class Commands:
 
     @staticmethod
     def __list():
-        revisions = MigrationEngine().list_revisions()
+        revisions = MigrationEngine(config=load_config()).list_revisions()
         for revision in revisions:
             print('- ' + revision.name)
 

@@ -299,3 +299,18 @@ def test_rollback_migration(initialized_project, db_instance):
     )
 
     assert list(cursor.fetchall()) == []
+
+
+def test_list_migrations(initialized_project):
+    project_path, versions_dir = initialized_project
+
+    cmd = Commands(CommandsEnum.GENERATE)
+
+    cmd.dispatch(migration_name="create_users_table")
+    cmd.dispatch(migration_name="add_age_to_users")
+
+    generated_files = sorted(versions_dir.glob("*.sql"))
+    assert len(generated_files) == 2
+
+    cmd = Commands(CommandsEnum.LIST_REVISIONS)
+    cmd.dispatch()
