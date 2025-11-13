@@ -119,9 +119,9 @@ Migropy loads configuration in this order:
 | `MIGRO_DB_PASSWORD`     | Database password                          |
 | `MIGRO_DB_NAME`         | Database name                              |
 | `MIGRO_DB_TYPE`         | Database type (e.g., postgres, mysql)      |
-| `MIGRO_MIGRATIONS_PATH` | Path to migration scripts                  |
-| `MIGRO_BASE_SCHEMA`     | Base schema (Postgres only)                |
-| `MIGRO_LOG_LEVEL`       | Logging level (e.g., DEBUG, INFO, WARNING) |
+| `MIGRO_SCRIPT_LOCATION` | Path to migration scripts                  |
+| `MIGRO_DB_BASE_SCHEMA`  | Base schema (Postgres only)                |
+| `MIGRO_LOGGER_LEVEL`    | Logging level (e.g., DEBUG, INFO, WARNING) |
 
 ### 4. Create a new migration
 
