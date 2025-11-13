@@ -16,9 +16,6 @@ class Postgres(BaseAdapter):
         self.database = config.database
         self.conn: psycopg.Connection | None = None
 
-    def connection(self):
-        self.conn = self._create_connection()
-
     def __get_private_password(self) -> str:
         private_pwd: str = '*' * len(self.password)
         return private_pwd or '*'
@@ -36,7 +33,8 @@ class Postgres(BaseAdapter):
                 port=self.port,
                 user=self.user,
                 password=self.password,
-                dbname=self.database
+                dbname=self.database,
+                autocommit=True
             )
             logger.debug('connection created')
             return connection_instance
