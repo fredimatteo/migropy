@@ -80,13 +80,6 @@ class Commands:
             ini_content = ini_files[0].read_text(encoding="utf-8")
             Path("migropy.ini").write_text(ini_content, encoding="utf-8")
 
-            python_files = list(template_dir.glob("migropy_env.py"))
-            if not python_files:
-                raise FileNotFoundError("No .py template file found in the templates directory")
-
-            python_content = python_files[0].read_text(encoding="utf-8")
-            Path("migropy_env.py").write_text(python_content, encoding="utf-8")
-
             versions_path = Path(project_path) / "versions"
             versions_path.mkdir(parents=True, exist_ok=True)
 
