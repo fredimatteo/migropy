@@ -62,7 +62,7 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: testuser
-          DB_PASSWORD: testpassword
+          POSTGRES_PASSWORD: testpassword
           DB_NAME: testdb
           DB_TYPE: postgres
         run: |
