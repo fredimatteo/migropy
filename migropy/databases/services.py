@@ -16,9 +16,10 @@ def get_db_connector(config: Config) -> BaseAdapter:
         database=config.db_name
     )
 
+    if 'postgres' not in db_type.lower() and 'mysql' not in db_type.lower():
+        raise ValueError(f"unsupported database type: {db_type}")
+
     if 'postgres' in db_type.lower():
         return Postgres(config=cf)
-    elif 'mysql' in db_type.lower():
-        return MySql(config=cf)
 
-    raise ValueError(f"unsupported database type: {db_type}")
+    return MySql(config=cf)

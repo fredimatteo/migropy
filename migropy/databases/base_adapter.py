@@ -14,10 +14,6 @@ DbConnection: TypeAlias = Union[
 
 class BaseAdapter(ABC):
     @abstractmethod
-    def connection(self) -> DbConnection:
-        pass
-
-    @abstractmethod
     def execute(self, query):
         pass
 

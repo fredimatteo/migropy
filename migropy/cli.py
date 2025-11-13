@@ -9,7 +9,8 @@ def main():
     subparsers = parser.add_subparsers(dest="command")
 
     # Init command
-    subparsers.add_parser("init", help="project initialization")
+    init_parser = subparsers.add_parser("init", help="project initialization")
+    init_parser.add_argument("project_name", type=str, nargs="?", default="migropy", help="project name")
 
     # Generate command
     generate_parser = subparsers.add_parser("generate", help="generate a new migration")

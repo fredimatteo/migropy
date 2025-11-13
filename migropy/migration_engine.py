@@ -40,8 +40,9 @@ class MigrationEngine:
         :param config: Optional configuration object. If not provided, a default configuration is used.
         """
         self.db: Optional[BaseAdapter] = db
+        self.is_postgres = config.db_type == 'postgres'
+        self.base_schema = config.base_schema
         self.migration_dir: Path = Path(config.script_location).resolve()
-
 
     def init(self):
         """
@@ -85,6 +86,7 @@ class MigrationEngine:
             lines = revision.read_text().splitlines()
             builder = StringIO()
             for line in lines:
+                line = line.strip()
                 if line.startswith(MigrationConstants.UP_PREFIX):
                     continue
                 if line.startswith(MigrationConstants.DOWN_PREFIX):
@@ -92,9 +94,13 @@ class MigrationEngine:
                 if not line.startswith(MigrationConstants.COMMENT_PREFIX):
                     builder.writelines([line, "\n"])
 
-            print(builder.getvalue())
-            self.db.execute(builder.getvalue())
-            self.db.commit()
+            try:
+                self.db.execute(builder.getvalue())
+                self.db.commit()
+            except Exception as e:
+                logger.error(f"Error while upgrading migration {revision.name}: {e}")
+                self.db.rollback()
+                sys.exit(1)
 
         last_revision_name = self.__get_last_revision_name()
         self.upsert_migration_table(last_revision_name)
@@ -111,6 +117,7 @@ class MigrationEngine:
             builder = StringIO()
             is_down = False
             for line in lines:
+                line = line.strip()
                 if line.startswith(MigrationConstants.DOWN_PREFIX):
                     is_down = True
                     continue
@@ -118,8 +125,13 @@ class MigrationEngine:
                     builder.write(line)
                     builder.write("\n")
 
-            self.db.execute(builder.getvalue())
-            self.db.commit()
+            try:
+                self.db.execute(builder.getvalue())
+                self.db.commit()
+            except Exception as e:
+                logger.error(f"Error while downgrading migration {revision.name}: {e}")
+                self.db.rollback()
+                sys.exit(1)
 
         last_revision_name = self.__get_last_revision_name(is_downgrade=True)
         self.upsert_migration_table(last_revision_name)
@@ -158,19 +170,30 @@ class MigrationEngine:
             builder = StringIO()
             is_down = False
             for line in lines:
+                line = line.strip()
                 if line.startswith(MigrationConstants.DOWN_PREFIX):
                     is_down = True
                     continue
                 if not line.startswith(MigrationConstants.COMMENT_PREFIX) and is_down:
                     builder.write(line + "\n")
 
-            self.db.execute(builder.getvalue())
-            self.db.commit()
+            try:
+                self.db.execute(builder.getvalue())
+                self.db.commit()
+            except Exception as e:
+                logger.error(f"Error while rolling back migration {revision.name}: {e}")
+                self.db.rollback()
+                sys.exit(1)
 
         new_last_index = executed_index - migrations_to_rollback
 
         if new_last_index < 0:
-            self.db.execute("DELETE FROM migrations")
+            if self.is_postgres:
+                statement = f"DELETE FROM {self.base_schema}.migrations"
+            else:
+                statement = "DELETE FROM migrations"
+
+            self.db.execute(statement)
         else:
             new_revision_name = all_revisions[new_last_index].name
             self.upsert_migration_table(new_revision_name)
@@ -184,13 +207,20 @@ class MigrationEngine:
         :param revision_name: The name of the last executed revision file.
         """
         if not self.__at_least_one_revision_executed():
-            self.db.execute(f"""
-                INSERT INTO migrations (name) VALUES ('{revision_name}')
-            """)
+            if self.is_postgres:
+                statement = f"""INSERT INTO {self.base_schema}.migrations (name) VALUES ('{revision_name}')"""
+            else:
+                statement = f"""INSERT INTO migrations (name) VALUES ('{revision_name}')"""
+
+            self.db.execute(statement)
         else:
-            self.db.execute(f"""
-                UPDATE migrations SET name = '{revision_name}'
-            """)
+            if self.is_postgres:
+                statement = f"""UPDATE {self.base_schema}.migrations SET name = '{revision_name}'"""
+            else:
+                statement = f"""UPDATE migrations SET name = '{revision_name}'"""
+
+            self.db.execute(statement)
+
         self.db.commit()
 
     def __create_migration_table(self) -> None:
@@ -200,13 +230,25 @@ class MigrationEngine:
         """
         if self.db:
             logger.debug('creating migrations table')
-            self.db.execute("""
-                CREATE TABLE IF NOT EXISTS migrations (
+
+            if self.is_postgres:
+                statement = f"""
+                CREATE TABLE IF NOT EXISTS {self.base_schema}.migrations (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            else:
+                statement = """
+                    CREATE TABLE IF NOT EXISTS migrations (
+                        id SERIAL PRIMARY KEY,
+                        name VARCHAR(255) NOT NULL,
+                        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """
+
+            self.db.execute(statement)
             self.db.commit()
 
     def __create_revision_file(self, revision_name: str) -> None:
@@ -249,7 +291,6 @@ class MigrationEngine:
         file_names.sort()
         return file_names[-1] if not is_downgrade else file_names[0]
 
-
     def __at_least_one_revision_executed(self) -> bool:
         """
         Checks if at least one migration has already been executed.
@@ -257,7 +298,13 @@ class MigrationEngine:
         :return: True if the migrations table contains any rows.
         """
         logger.debug('checking if at least one revision has been executed')
-        result = self.db.execute("SELECT COUNT(*) FROM migrations")
+
+        if self.is_postgres:
+            statement = f"SELECT COUNT(*) FROM {self.base_schema}.migrations"
+        else:
+            statement = "SELECT COUNT(*) FROM migrations"
+
+        result = self.db.execute(statement)
         return result.fetchone()[0] > 0
 
     def __get_last_revision_executed_name(self) -> str | None:
@@ -266,7 +313,12 @@ class MigrationEngine:
 
         :return: The name of the last executed revision.
         """
-        result = self.db.execute("SELECT name FROM migrations")
+        if self.is_postgres:
+            statement = f"SELECT name FROM {self.base_schema}.migrations"
+        else:
+            statement = "SELECT name FROM migrations"
+
+        result = self.db.execute(statement)
         result = result.fetchone()
         if len(result) > 0:
             return result[0]

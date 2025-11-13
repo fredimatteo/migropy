@@ -34,6 +34,10 @@ class Commands:
 
         match self.command:
             case CommandsEnum.INIT:
+                if "project_name" in kwargs:
+                    project_name = kwargs["project_name"]
+                    self.__init(project_name)
+                    return
                 self.__init()
             case CommandsEnum.GENERATE:
                 if "migration_name" not in kwargs:
@@ -69,7 +73,7 @@ class Commands:
             if not template_dir.exists():
                 raise FileNotFoundError(f"Template directory {template_dir} does not exist")
 
-            ini_files = list(template_dir.glob("*.ini"))
+            ini_files = list(template_dir.glob("migropy.ini"))
             if not ini_files:
                 raise FileNotFoundError("No .ini template file found in the templates directory")
 
@@ -88,7 +92,7 @@ class Commands:
     @staticmethod
     def __generate(migration_name: str):
         db = get_db_connector(load_config())
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
 
         migration_engine.init()
         migration_engine.generate_revision(migration_name)
@@ -97,19 +101,19 @@ class Commands:
     def __upgrade():
         db = get_db_connector(load_config())
 
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
         migration_engine.upgrade()
 
     @staticmethod
     def __downgrade():
         db = get_db_connector(load_config())
 
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
         migration_engine.downgrade()
 
     @staticmethod
     def __list():
-        revisions = MigrationEngine().list_revisions()
+        revisions = MigrationEngine(config=load_config()).list_revisions()
         for revision in revisions:
             print('- ' + revision.name)
 
@@ -117,5 +121,5 @@ class Commands:
     def __rollback(migrations_to_rollback: int):
         db = get_db_connector(load_config())
 
-        migration_engine = MigrationEngine(db)
+        migration_engine = MigrationEngine(db, load_config())
         migration_engine.rollback(migrations_to_rollback)

@@ -16,9 +16,6 @@ class MySql(BaseAdapter):
         self.database = config.database
         self.conn: mysql.connector.connection.MySQLConnection | None = None
 
-    def connection(self):
-        self.conn = self.__create_connection()
-
     def __create_connection(self):
         try:
             connection_instance = mysql.connector.connect(
@@ -39,7 +36,7 @@ class MySql(BaseAdapter):
 
     def execute(self, query):
         if not self.conn:
-            self.connection()
+            self.__create_connection()
 
         try:
             cursor = self.conn.cursor()
