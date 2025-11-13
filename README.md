@@ -14,12 +14,13 @@ environments.
 - [🚀 Features](#-features)
 - [📦 Installation](#-installation)
 - [📖 How to use - CLI](#-how-to-use---cli)
-  - [1. Initialize a new migration project](#1-initialize-a-new-migration-project)
-  - [2. Fill the config.ini file](#2-fill-the-configini-file)
-  - [3. Create a new migration](#3-create-a-new-migration)
-  - [4. Apply the migrations](#4-apply-the-migrations)
-  - [5. Downgrade the migrations](#5-downgrade-the-migrations)
-  - [6. Rollback the migrations](#6-rollback-the-migrations)
+    - [1. Initialize a new migration project](#1-initialize-a-new-migration-project)
+    - [2. Fill the config.ini file](#2-fill-the-configini-file)
+    - [3. 🔐 Using a .env file or environment variables](#3-using-a-env-file-or-environment-variables)
+    - [4. Create a new migration](#3-create-a-new-migration)
+    - [5. Apply the migrations](#4-apply-the-migrations)
+    - [6. Downgrade the migrations](#5-downgrade-the-migrations)
+    - [7. Rollback the migrations](#6-rollback-the-migrations)
 - [🐍 How to use - Python](#-how-to-use---python)
 - [📄 Migration example](#-migration-example)
 - [⚙️ Available commands](#-available-commands)
@@ -28,7 +29,6 @@ environments.
 - [🤝 Contributing](#-contributing)
 - [📫 Support](#-support)
 - [📄 License](#-license)
-
 
 ---
 
@@ -56,12 +56,16 @@ pip install migropy
 
 This command will create a new directory called `migropy` with the necessary files to manage your migrations & db
 parameters.
+
 ```bash
 migropy init <optional_migration_directory_name>
 ```
 
 ### 2. Fill the config.ini file
-This file is generated in your current directory and contains the database connection parameters and the path to the migration
+
+This file is generated in your current directory and contains the database connection parameters and the path to the
+migration
+
 ```ini
 [database]
 # database connection parameters
@@ -85,7 +89,41 @@ base_schema = public
 level = INFO
 ```
 
-### 3. Create a new migration
+### 3. 🔐 Using a .env file or environment variables
+
+Migropy supports environment variables and .env files to avoid committing credentials or secrets to your repository.
+
+This allows usage in:
+
+* Local development
+* CI/CD pipelines
+* Docker
+* Production environments
+
+#### 🔎 How it works
+
+Migropy loads configuration in this order:
+
+1. Environment variables
+2. .env file (if present in the current working directory)<br>
+
+👉 Environment variables always override values from the .ini file.
+
+#### ⚙️ Supported environment variables
+
+| Environment Variable      | Description                                |
+|---------------------------|--------------------------------------------|
+| `MIGROPY_DB_HOST`         | Database host                              |
+| `MIGROPY_DB_PORT`         | Database port                              |
+| `MIGROPY_DB_USER`         | Database user                              |
+| `MIGROPY_DB_PASSWORD`     | Database password                          |
+| `MIGROPY_DB_NAME`         | Database name                              |
+| `MIGROPY_DB_TYPE`         | Database type (e.g., postgres, mysql)      |
+| `MIGROPY_MIGRATIONS_PATH` | Path to migration scripts                  |
+| `MIGROPY_BASE_SCHEMA`     | Base schema (Postgres only)                |
+| `MIGROPY_LOG_LEVEL`       | Logging level (e.g., DEBUG, INFO, WARNING) |
+
+### 4. Create a new migration
 
 This command will create a new migration file in the `migropy/versions` directory with the following template:
 
@@ -99,26 +137,29 @@ migropy generate 'migration name'
 -- Down migration
 ```
 
-### 4. Apply the migrations
+### 5. Apply the migrations
 
 This command will apply all the migrations in the `migrations` directory. Please note the migrations are applied in
 the prefix order.
+
 ```bash
 migropy upgrade
 ```
 
-### 5. Downgrade the migrations
+### 6. Downgrade the migrations
 
-This command will downgrade all the migrations in the `migrations` directory. Please note the migrations are 
+This command will downgrade all the migrations in the `migrations` directory. Please note the migrations are
 downgraded in
 the prefix order.
+
 ```bash
 migropy downgrade
 ```
 
-### 6. Rollback the migrations
+### 7. Rollback the migrations
 
 This command will rollback the last n migrations in the `migrations` directory, starting from the last one executed.
+
 ```bash
 migropy rollback <n>
 ```
@@ -144,11 +185,11 @@ from migropy.migration_engine import MigrationEngine
 
 # Create a database configuration object with connection parameters
 db_config = DbConfig(
-    host="localhost",      # Database server hostname or IP
-    port=5432,             # Default PostgreSQL port
-    user="user",           # Username to connect to the database
-    password="password",   # Password for the given user
-    database="test"        # Name of the target database
+    host="localhost",  # Database server hostname or IP
+    port=5432,  # Default PostgreSQL port
+    user="user",  # Username to connect to the database
+    password="password",  # Password for the given user
+    database="test"  # Name of the target database
 )
 
 # Instantiate a Postgres database connection using the provided configuration
@@ -243,7 +284,8 @@ To get started:
 
 ## 📫 Support
 
-For issues, feature requests or general questions, open an issue on [GitHub Issues](https://github.com/fredimatteo/migratron/issues).
+For issues, feature requests or general questions, open an issue
+on [GitHub Issues](https://github.com/fredimatteo/migratron/issues).
 
 
 ---
