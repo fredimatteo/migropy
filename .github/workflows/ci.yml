@@ -66,8 +66,8 @@ jobs:
             POSTGRES_USER: testuser
             POSTGRES_PASSWORD: testpassword
             POSTGRES_DB: testdb
-            POSTGRES_HOST: postgres
-            POSTGRES_PORT: 5432
+            DB_HOST: postgres
+            DB_PORT: 5432
             DB_TYPE: postgres
         run: |
           poetry run pytest --rootdir=tests
