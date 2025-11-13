@@ -61,9 +61,9 @@ jobs:
         env:
           DB_HOST: localhost
           DB_PORT: 5432
-          DB_USER: testuser
+          POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
-          DB_NAME: testdb
+          POSTGRES_DB: testdb
           DB_TYPE: postgres
         run: |
           python -m pip install --upgrade pip
