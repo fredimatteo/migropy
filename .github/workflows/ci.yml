@@ -60,7 +60,7 @@ jobs:
       - name: Install dependencies and run tests
         env:
           DB_HOST: postgres
-          DB_PORT: 5432
+          DB_PORT: localhost
           DB_USER: testuser
           DB_PASSWORD: testpassword
           DB_NAME: testdb
