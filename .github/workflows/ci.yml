@@ -61,6 +61,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
+      - name: Debug environment
+        run: env | sort
       - name: Run tests
         env:
             POSTGRES_USER: testuser
@@ -71,5 +73,3 @@ jobs:
             DB_TYPE: postgres
         run: |
           poetry run pytest --rootdir=tests
-      - name: Debug environment
-        run: env | sort
