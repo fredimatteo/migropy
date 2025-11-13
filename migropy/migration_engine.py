@@ -86,6 +86,7 @@ class MigrationEngine:
             lines = revision.read_text().splitlines()
             builder = StringIO()
             for line in lines:
+                line = line.strip()
                 if line.startswith(MigrationConstants.UP_PREFIX):
                     continue
                 if line.startswith(MigrationConstants.DOWN_PREFIX):
@@ -93,8 +94,13 @@ class MigrationEngine:
                 if not line.startswith(MigrationConstants.COMMENT_PREFIX):
                     builder.writelines([line, "\n"])
 
-            self.db.execute(builder.getvalue())
-            self.db.commit()
+            try:
+                self.db.execute(builder.getvalue())
+                self.db.commit()
+            except Exception as e:
+                logger.error(f"Error while upgrading migration {revision.name}: {e}")
+                self.db.rollback()
+                sys.exit(1)
 
         last_revision_name = self.__get_last_revision_name()
         self.upsert_migration_table(last_revision_name)
@@ -111,6 +117,7 @@ class MigrationEngine:
             builder = StringIO()
             is_down = False
             for line in lines:
+                line = line.strip()
                 if line.startswith(MigrationConstants.DOWN_PREFIX):
                     is_down = True
                     continue
@@ -118,8 +125,13 @@ class MigrationEngine:
                     builder.write(line)
                     builder.write("\n")
 
-            self.db.execute(builder.getvalue())
-            self.db.commit()
+            try:
+                self.db.execute(builder.getvalue())
+                self.db.commit()
+            except Exception as e:
+                logger.error(f"Error while downgrading migration {revision.name}: {e}")
+                self.db.rollback()
+                sys.exit(1)
 
         last_revision_name = self.__get_last_revision_name(is_downgrade=True)
         self.upsert_migration_table(last_revision_name)
@@ -158,14 +170,20 @@ class MigrationEngine:
             builder = StringIO()
             is_down = False
             for line in lines:
+                line = line.strip()
                 if line.startswith(MigrationConstants.DOWN_PREFIX):
                     is_down = True
                     continue
                 if not line.startswith(MigrationConstants.COMMENT_PREFIX) and is_down:
                     builder.write(line + "\n")
 
-            self.db.execute(builder.getvalue())
-            self.db.commit()
+            try:
+                self.db.execute(builder.getvalue())
+                self.db.commit()
+            except Exception as e:
+                logger.error(f"Error while rolling back migration {revision.name}: {e}")
+                self.db.rollback()
+                sys.exit(1)
 
         new_last_index = executed_index - migrations_to_rollback
 
