@@ -59,18 +59,18 @@ jobs:
 
       - name: Install dependencies and run tests
         env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb
-          DB_TYPE: postgres
+          MIGRO_DB_HOST: localhost
+          MIGRO_DB_PORT: 5432
+          MIGRO_DB_USER: testuser
+          MIGRO_DB_PASSWORD: testpassword
+          MIGRO_DB_NAME: testdb
+          MIGRO_DB_TYPE: postgres
         run: |
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
 
           echo "Waiting 5 seconds for postgres to be fully ready..."
-          sleep 5  # eventuali ritardi nella startup
+          sleep 5
 
           poetry run pytest --rootdir=tests
