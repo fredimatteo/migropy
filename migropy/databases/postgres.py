@@ -34,8 +34,8 @@ class Postgres(BaseAdapter):
                 user=self.user,
                 password=self.password,
                 dbname=self.database,
-                autocommit=True
             )
+            connection_instance.autocommit = True
             logger.debug('connection created')
             return connection_instance
         except psycopg.Error as e:
