@@ -57,7 +57,7 @@ pip install migropy
 This command will create a new directory called `migropy` with the necessary files to manage your migrations & db
 parameters.
 ```bash
-migropy init
+migropy init <optional_migration_directory_name>
 ```
 
 ### 2. Fill the config.ini file
@@ -192,14 +192,14 @@ DROP TABLE users;
 
 ## ⚙️ Available commands
 
-| Comando                       | Descrizione                   |
-|-------------------------------|-------------------------------|
-| `migropy init`                | Init migratron environment    |
-| `migropy generate <name:str>` | Generate a new sql migration  |
-| `migropy upgrade`             | Apply all the migration       |
-| `migropy downgrade`           | Rollback all revisions        |
-| `migropy rollback <n:int>`    | Rollback n revisions          |
-| `migropy list `               | Show current migration status |
+| Comando                                   | Descrizione                   |
+|-------------------------------------------|-------------------------------|
+| `migropy init <optional_folder_name:str>` | Init migratron environment    |
+| `migropy generate <name:str>`             | Generate a new sql migration  |
+| `migropy upgrade`                         | Apply all the migration       |
+| `migropy downgrade`                       | Rollback all revisions        |
+| `migropy rollback <n:int>`                | Rollback n revisions          |
+| `migropy list `                           | Show current migration status |
 
 ---
 
@@ -219,6 +219,7 @@ See the full [CHANGELOG.md](https://github.com/fredimatteo/migratron/blob/main/C
 
 ### Latest Changes
 
+- **0.4.0** - Dependencies update, custom migration directory name & env variables support
 - **0.3.1** - Code refactor to improve readability and maintainability
 - **0.3.0** - Add rollback command
 - **0.2.2** – Commands refactor & usage from python code
