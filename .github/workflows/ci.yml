@@ -71,3 +71,5 @@ jobs:
             DB_TYPE: postgres
         run: |
           poetry run pytest --rootdir=tests
+      - name: Debug environment
+        run: env | sort
